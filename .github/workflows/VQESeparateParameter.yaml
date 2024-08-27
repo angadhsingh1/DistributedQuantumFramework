@@ -23,7 +23,7 @@ jobs:
         run: |
           pip install -r requirements.txt
       - name: Run VQE Separated Parameter Orchestrator
-        run: python VQESeparateParameter(VSP)/VQEOrchestrator.py
+        run: python VQESeparateParameter-VSP/VSPOrchestrator.py
       - name: Upload final results
         uses: actions/upload-artifact@v3
         with:
@@ -51,7 +51,7 @@ jobs:
         run: |
           pip install -r requirements.txt
       - name: Run VQE Separated Parameter Worker
-        run: python VQESeparateParameter(VSP)/VQEWorker.py ${{ matrix.worker-id }}
+        run: python VQESeparateParameter-VSP/VSPWorker.py ${{ matrix.worker-id }}
       - name: Upload worker results
         uses: actions/upload-artifact@v3
         with:
