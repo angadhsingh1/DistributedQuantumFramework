@@ -1,0 +1,144 @@
+name: Run VQE simple on 4 different machines and combine results. 
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  run_on_machine_1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository content
+        uses: actions/checkout@v2 
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.12.2'
+
+      - name: Install dependencies
+        run: |
+          pip3 install -r requirements.txt
+
+      - name: Run quantum algorithm
+        run: python3 MultipleVMSimple/VQE.py > output_machine_1.txt
+
+      - name: Upload results
+        uses: actions/upload-artifact@v3
+        with:
+          name: output-machine-1
+          path: output_machine_1.txt
+
+  run_on_machine_2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository content
+        uses: actions/checkout@v2 
+        
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.12.2'
+
+      - name: Install dependencies
+        run: |
+          pip3 install -r requirements.txt
+
+      - name: Run quantum algorithm
+        run: python3 MultipleVMSimple/VQE.py > output_machine_2.txt
+
+      - name: Upload results
+        uses: actions/upload-artifact@v3
+        with:
+          name: output-machine-2
+          path: output_machine_2.txt
+
+  run_on_machine_3:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository content
+        uses: actions/checkout@v2 
+        
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.12.2'
+
+      - name: Install dependencies
+        run: |
+          pip3 install -r requirements.txt
+
+      - name: Run quantum algorithm
+        run: python3 MultipleVMSimple/VQE.py > output_machine_3.txt
+
+      - name: Upload results
+        uses: actions/upload-artifact@v3
+        with:
+          name: output-machine-3
+          path: output_machine_3.txt
+
+  run_on_machine_4:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository content
+        uses: actions/checkout@v2 
+        
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.12.2'
+
+      - name: Install dependencies
+        run: |
+          pip3 install -r requirements.txt
+
+      - name: Run quantum algorithm
+        run: python3 MultipleVMSimple/VQE.py > output_machine_4.txt
+
+      - name: Upload results
+        uses: actions/upload-artifact@v3
+        with:
+          name: output-machine-4
+          path: output_machine_4.txt
+
+  compile_results:
+    runs-on: ubuntu-latest
+    needs: [run_on_machine_1, run_on_machine_2, run_on_machine_3, run_on_machine_4]
+    steps:
+      - name: Checkout repository content
+        uses: actions/checkout@v2 
+        
+      - name: Download results from machine 1
+        uses: actions/download-artifact@v3
+        with:
+          name: output-machine-1
+          path: ./results
+
+      - name: Download results from machine 2
+        uses: actions/download-artifact@v3
+        with:
+          name: output-machine-2
+          path: ./results
+
+      - name: Download results from machine 3
+        uses: actions/download-artifact@v3
+        with:
+          name: output-machine-3
+          path: ./results
+
+      - name: Download results from machine 4
+        uses: actions/download-artifact@v3
+        with:
+          name: output-machine-4
+          path: ./results
+
+      - name: Combine and analyze results
+        run: |
+          python compile_results.py > combined_results.txt
+  
+      - name: Upload combined results
+        uses: actions/upload-artifact@v3
+        with:
+          name: combined-results
+          path: combined_results.txt
