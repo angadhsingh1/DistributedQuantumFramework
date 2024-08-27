@@ -135,7 +135,7 @@ jobs:
 
       - name: Combine and analyze results
         run: |
-          python compile_results.py > combined_results.txt
+          python MultipleVMSimple/compile_results.py > combined_results.txt
   
       - name: Upload combined results
         uses: actions/upload-artifact@v3
