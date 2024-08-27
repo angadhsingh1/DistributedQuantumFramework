@@ -1,18 +1,21 @@
-name: VSP Orchestrator and workers
-
+name: VSP Orchestrator, Workers, and Results
 on:
   push:
     branches:
       - main
 
 jobs:
-  orchestrator:
+  setup-redis:
     runs-on: ubuntu-latest
-    services:
-      redis:
-        image: redis
-        ports:
-          - 6379:6379
+    steps:
+      - name: Start Redis
+        uses: supercharge/redis-github-action@1.8.0
+        with:
+          redis-version: 6
+
+  orchestrator:
+    needs: setup-redis
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python
@@ -22,13 +25,10 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-      - name: Run VQE Separated Parameter Orchestrator
+      - name: Run VSP Orchestrator
         run: python VQESeparateParameter-VSP/VSPOrchestrator.py
-      - name: Upload final results
-        uses: actions/upload-artifact@v3
-        with:
-          name: final-results
-          path: final_results.txt
+        env:
+          REDIS_URL: redis://localhost:6379
 
   worker:
     needs: orchestrator
@@ -36,11 +36,6 @@ jobs:
     strategy:
       matrix:
         worker-id: [1, 2, 3, 4, 5]  # Create 5 parallel jobs
-    services:
-      redis:
-        image: redis
-        ports:
-          - 6379:6379
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python
@@ -50,10 +45,29 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-      - name: Run VQE Separated Parameter Worker
+      - name: Run VSP Worker
         run: python VQESeparateParameter-VSP/VSPWorker.py ${{ matrix.worker-id }}
-      - name: Upload worker results
+        env:
+          REDIS_URL: redis://localhost:6379
+
+  results:
+    needs: worker
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.12.2'
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+      - name: Run VSP Results
+        run: python VQESeparateParameter-VSP/VSPResults.py
+        env:
+          REDIS_URL: redis://localhost:6379
+      - name: Upload final results
         uses: actions/upload-artifact@v3
         with:
-          name: worker-results-${{ matrix.worker-id }}
-          path: worker_output_${{ matrix.worker-id }}.txt
+          name: final-results
+          path: final_results.txt
