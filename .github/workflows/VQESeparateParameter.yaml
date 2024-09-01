@@ -32,7 +32,9 @@ jobs:
           REDIS_URL: redis://localhost:6379
 
   worker:
-    needs: orchestrator
+    needs:
+      - setup-redis
+      - orchestrator
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -52,7 +54,9 @@ jobs:
           REDIS_URL: redis://localhost:6379
 
   results:
-    needs: worker
+    needs:
+      - setup-redis 
+      - worker
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
