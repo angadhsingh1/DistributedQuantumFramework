@@ -14,65 +14,65 @@ jobs:
         with:
           redis-version: 6
 
-  orchestrator:
-    needs: setup-redis
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.12.2'
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-      - name: Run VSP Orchestrator
-        run: python VQESeparateParameter-VSP/VSPOrchestrator.py
-        env:
-          REDIS_URL: redis://localhost:6379
+  # orchestrator:
+  #   needs: setup-redis
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Set up Python
+  #       uses: actions/setup-python@v2
+  #       with:
+  #         python-version: '3.12.2'
+  #     - name: Install dependencies
+  #       run: |
+  #         pip install -r requirements.txt
+  #     - name: Run VSP Orchestrator
+  #       run: python VQESeparateParameter-VSP/VSPOrchestrator.py
+  #       env:
+  #         REDIS_URL: redis://localhost:6379
 
-  worker:
-    needs:
-      - setup-redis
-      - orchestrator
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        worker-id: [1, 2, 3, 4, 5]  # Create 5 parallel jobs
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.12.2'
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-      - name: Run VSP Worker
-        run: python VQESeparateParameter-VSP/VSPWorker.py ${{ matrix.worker-id }}
-        env:
-          REDIS_URL: redis://localhost:6379
+  # worker:
+  #   needs:
+  #     - setup-redis
+  #     - orchestrator
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     matrix:
+  #       worker-id: [1, 2, 3, 4, 5]  # Create 5 parallel jobs
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Set up Python
+  #       uses: actions/setup-python@v2
+  #       with:
+  #         python-version: '3.12.2'
+  #     - name: Install dependencies
+  #       run: |
+  #         pip install -r requirements.txt
+  #     - name: Run VSP Worker
+  #       run: python VQESeparateParameter-VSP/VSPWorker.py ${{ matrix.worker-id }}
+  #       env:
+  #         REDIS_URL: redis://localhost:6379
 
-  results:
-    needs:
-      - setup-redis 
-      - worker
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.12.2'
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-      - name: Run VSP Results
-        run: python VQESeparateParameter-VSP/VSPResults.py
-        env:
-          REDIS_URL: redis://localhost:6379
-      - name: Upload final results
-        uses: actions/upload-artifact@v3
-        with:
-          name: final-results
-          path: final_results.txt
+  # results:
+  #   needs:
+  #     - setup-redis 
+  #     - worker
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Set up Python
+  #       uses: actions/setup-python@v2
+  #       with:
+  #         python-version: '3.12.2'
+  #     - name: Install dependencies
+  #       run: |
+  #         pip install -r requirements.txt
+  #     - name: Run VSP Results
+  #       run: python VQESeparateParameter-VSP/VSPResults.py
+  #       env:
+  #         REDIS_URL: redis://localhost:6379
+  #     - name: Upload final results
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: final-results
+  #         path: final_results.txt
