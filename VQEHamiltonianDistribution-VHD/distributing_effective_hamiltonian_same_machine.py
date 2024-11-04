@@ -28,6 +28,7 @@ def print_hamiltonian_details(hamiltonian):
     print("Hamiltonian Pauli operator data", hamiltonian.paulis)
     print("Hamiltonian Pauli operator coefficients", hamiltonian.coeffs)
 
+
 def parallel_cost_function_VM(x0, ansatz_isa, hamiltonian_isa, backend_passed):
     """
     Evaluate the cost function in parallel for each Hamiltonian term
@@ -58,6 +59,7 @@ def parallel_cost_function_VM(x0, ansatz_isa, hamiltonian_isa, backend_passed):
     print("----------------- Ending parallel minimization -----------------")
     return result
 
+
 def apply_pauli_operator(circuit, pauli, qubit_index):
     if pauli == 'X':
         circuit.x(qubit_index)
@@ -66,6 +68,7 @@ def apply_pauli_operator(circuit, pauli, qubit_index):
     elif pauli == 'Z':
         circuit.z(qubit_index)
     return circuit
+
 
 def generate_local_basis(optimized_circuit, num_qubits):
     """Generate local basis states by applying Pauli operators on the optimized circuit."""
@@ -76,6 +79,7 @@ def generate_local_basis(optimized_circuit, num_qubits):
             apply_pauli_operator(new_circuit, pauli, qubit_index)
             basis.append(new_circuit)
     return basis
+
 
 def process_hamiltonian_term(hamiltonian_term):
     """
@@ -129,7 +133,6 @@ def process_hamiltonian(hamiltonian, number_of_workers):
     return results
 
 
-
 def calculate_total_energy(results):
     total_energy = 0
     with open('final_results.txt', 'w') as f:
@@ -149,7 +152,6 @@ def calculate_total_energy(results):
     print(f"All tasks completed. Results saved in 'final_results.txt'")
     print(f"Total Energy: {total_energy}")
     
-
 
 def main():
     """

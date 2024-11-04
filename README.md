@@ -1,5 +1,46 @@
 # Distributed Quantum Computing Sandbox
 
+
+## Running Differernt Experiments:
+
+Make sure to run Virtual Environment before running the experiments. Run the following command in root directory
+`source .venv/bin/activate`
+
+### EXP1. Running Multiple Virtual Machines on Different Simulator
+
+On terminal from root project directory 
+`cd MultipleVMSimple/`
+`python3 VQE.py`
+
+### EXP2. Multithreading using Dask Library
+An alternate to sending a VQE experiment to mutiple Virtual machines is allocation of different processes within same computer. 
+
+On terminal from root project directory 
+`cd MultithreadingUsingDask/`
+`python3 VQEMultithreadingUsingDask.py`
+
+### EXP3. Running VQE using Separate Parameters
+
+#### Option 1: Split the terminal into two : Make sure enable virtual environment in both terminals. 
+
+For both terminals run:
+`cd VQESeparateParameter-VSP/`
+
+Terminal 1: `python3 VSPOrchestrator.py`
+
+Run the commands on Terminal 2 one after another
+Terminal 2: `python3 VSPWorker.py 1`
+Terminal 2: `python3 VSPWorker.py 2`
+Terminal 2: `python3 VSPWorker.py 3`
+Terminal 2: `python3 VSPWorker.py 4`
+
+The results are saved in final_results.txt in same directory. 
+
+#### Option 2: Run the same experiment with using `for loops`
+On terminal run: `python3 VSPUsingForLoops.py`
+Results are saved in `vqe_on_single_machine.json`
+
+
 ### Summary
 
 Distributed quantum computing (DQC) is a rapidly evolving field with its own unique challenges. Distributing a quantum algorithm involves several key steps and considerations. The steps involve decomposition at various levels of abstraction, given the underlying quantum stack and quantum network capabilities. In our DQC design explorations, we focus on the distribution at the algorithm and circuit levels. 

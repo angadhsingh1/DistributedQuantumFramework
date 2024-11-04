@@ -1,0 +1,34 @@
+Have EC2 instances 
+containerize the applicaiton 
+deploy at uvic servers
+
+Filename: redis.service
+[Unit]
+Description=RedisServer
+After=docker.service
+Requires=docker.service
+
+[Service]
+TimeoutStartSec=0
+Restart=always
+ExecStartPre=-/usr/bin/docker exec %n stop
+ExecStartPre=-/usr/bin/docker rm %n
+ExecStartPre=/usr/bin/docker pull redis:5
+ExecStart=/usr/bin/docker run --rm --name %n -p 6379:6379 -d redis:5
+
+[Install]
+WantedBy=default.target
+
+
+To start a service
+service redis enable
+
+service redis start
+
+For persistance in data change the start command to match volume to container
+ExecStart=/usr/bin/docker run --rm --name %n -p 6379:6379 -v /path/on/host:/data -d redis:5 redis-server --appendonly yes
+
+
+For config to redis, mount redis volume
+
+

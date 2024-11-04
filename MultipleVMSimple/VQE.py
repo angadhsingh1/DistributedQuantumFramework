@@ -1,7 +1,8 @@
 """
 Code taken from Qiskit Tutorial on Varaitional Quantum Eigensolver. 
-The tutorial is not archived and not availbale IBM Quantum platform. 
+The tutorial is not archived and not availbale IBM Quantum platform anymore. 
 
+August 2024
 """
 
 
