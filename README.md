@@ -40,8 +40,28 @@ The results are saved in final_results.txt in same directory.
 On terminal run: `python3 VSPUsingForLoops.py`
 Results are saved in `vqe_on_single_machine.json`
 
+### EXP4. Running VQE using Distributing Hamiltonians
 
-### Summary
+#### Option 1: Split the terminal into two : Make sure enable virtual environment in both terminals. 
+
+For both terminals run:
+`cd VQEHamiltonianDistribution-VHD/`
+
+Terminal 1: `python3 VHDOrchestrator.py`
+
+Run the commands on Terminal 2 one after another
+Terminal 2: `python3 VHDWorker.py 1`
+Terminal 2: `python3 VHDWorker.py 2`
+Terminal 2: `python3 VHDWorker.py 3`
+Terminal 2: `python3 VHDWorker.py 4`
+
+The results are saved in final_results.txt in same directory. 
+
+#### Option 2: Run the same experiment with using `for loops`
+On terminal run: `python3 VHDUsingForLoops.py`
+
+
+### Description of Experiment
 
 Distributed quantum computing (DQC) is a rapidly evolving field with its own unique challenges. Distributing a quantum algorithm involves several key steps and considerations. The steps involve decomposition at various levels of abstraction, given the underlying quantum stack and quantum network capabilities. In our DQC design explorations, we focus on the distribution at the algorithm and circuit levels. 
 

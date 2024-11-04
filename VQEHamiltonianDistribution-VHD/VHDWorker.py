@@ -63,18 +63,13 @@ def process_received_data(data):
     print(f"Processing received data: {data}")
     
     if isinstance(data, dict) and 'paulis' in data and 'coeffs' in data:
-        # Handle the expected dictionary format
         paulis = data['paulis']
         coeffs = [complex(c['real'], c['imag']) for c in data['coeffs']]
         return SparsePauliOp(paulis, coeffs)
     elif isinstance(data, list):
-        # Handle the list format
         if all(isinstance(item, (int, float)) for item in data):
-            # If it's a list of numbers, treat it as parameters
-            # You might need to adjust this part based on how these parameters are meant to be used
             return data
         else:
-            # If it's a list of [pauli_string, coefficient] pairs
             return SparsePauliOp.from_list(data)
     else:
         raise ValueError(f"Unexpected data format: {type(data)}")
@@ -90,9 +85,6 @@ def numpy_to_python(obj):
 def serialize_optimize_result(result):
     """
     Serialize an OptimizeResult object to a JSON string.
-    
-    :param result: OptimizeResult object
-    :return: JSON string
     """
     result_dict = {
         'x': numpy_to_python(result.x),
@@ -102,7 +94,6 @@ def serialize_optimize_result(result):
         'nfev': numpy_to_python(result.nfev),
     }
 
-    # Optionally include attributes that might not always be present
     optional_attrs = ['nit', 'status', 'jac']
     for attr in optional_attrs:
         if hasattr(result, attr):
@@ -114,62 +105,45 @@ def main(worker_id):
     r = redis.Redis(host='localhost', port=6379, decode_responses=True)
     print(f"Worker {worker_id} started")
     
-    while True:
-        print(f"Worker {worker_id} waiting for task...")
-        # Wait for start signal
-        
-        start_signal= r.blpop(f'worker:{worker_id}:control', timeout=180)
-        
-        if not start_signal:
-            print(f"Worker {worker_id} timed out waiting for start signal")
-            break
-        
-        print(f"Worker {worker_id} received start signal")
-        task = r.blpop(f'worker:{worker_id}:tasks_queue', timeout=180)
+    print(f"Worker {worker_id} waiting for task...")
+    
+    # Wait for start signal
+    start_signal = r.blpop(f'worker:{worker_id}:control', timeout=180)
+    
+    if not start_signal:
+        print(f"Worker {worker_id} timed out waiting for start signal")
+        return
+    
+    print(f"Worker {worker_id} received start signal")
+    task = r.blpop(f'worker:{worker_id}:tasks_queue', timeout=180)
 
-        if task:
-            print(f"Worker {worker_id} received task")
-            print(f"Received task: {json.dumps(task, indent=2)}")
-            
-            task_data = json.loads(task[1])
-            hamiltonian_term_data = task_data['data']
-            print("Hamiltonian term on worker", hamiltonian_term_data)
-            
-            # Process the received data
-            hamiltonian_processed_data = process_received_data(hamiltonian_term_data)
-            print(f"Processed data: {hamiltonian_processed_data}")
-            print("Processed data type", type(hamiltonian_processed_data))
-            
-            # THIS IS WHERE THE NUMBER OF QUBITS CAN BE FIXED ON INITIAL HAMILTONIAN TERM
-            ansatz = EfficientSU2(hamiltonian_processed_data.num_qubits)
-            ansatz.decompose().draw("mpl", style="iqp")
-            num_params = ansatz.num_parameters
-            print(f"Number of parameters for given Hamiltonian: {num_params}")
-            
-            backend_passed = AerSimulator()
-            pm = generate_preset_pass_manager(backend=backend_passed, optimization_level=3)
-            ansatz_isa = pm.run(ansatz)
-            hamiltonian_isa = hamiltonian_processed_data.apply_layout(layout=ansatz_isa.layout)
-            print("hamiltonian_isa type", hamiltonian_isa)
-            
-            x0 = 2 * np.pi * np.random.random(num_params)
-            print("Initial parameters x0", x0)
-            
-            result = parallel_cost_function_VM(x0, ansatz_isa, hamiltonian_isa, backend_passed)
-            print("Result from minimization", result)
-            print("Result type", type(result))
-            json_result = serialize_optimize_result(result)
-            
-            # r.rpush('result_queue', json_result)
-            r.rpush(f'worker:{worker_id}:results', json_result)
-            print(f"Received result: {json_result}")
-            print(f"Worker {worker_id} pushed result to queue")
+    if task:
+        print(f"Worker {worker_id} received task")
+        task_data = json.loads(task[1])
+        hamiltonian_term_data = task_data['data']
+        
+        # Process the received data
+        hamiltonian_processed_data = process_received_data(hamiltonian_term_data)
+        
+        ansatz = EfficientSU2(hamiltonian_processed_data.num_qubits)
+        num_params = ansatz.num_parameters
+        
+        backend_passed = AerSimulator()
+        pm = generate_preset_pass_manager(backend=backend_passed, optimization_level=3)
+        ansatz_isa = pm.run(ansatz)
+        hamiltonian_isa = hamiltonian_processed_data.apply_layout(layout=ansatz_isa.layout)
+        
+        x0 = 2 * np.pi * np.random.random(num_params)
+        result = parallel_cost_function_VM(x0, ansatz_isa, hamiltonian_isa, backend_passed)
+        
+        json_result = serialize_optimize_result(result)
+        r.rpush(f'worker:{worker_id}:results', json_result)
+        print(f"Worker {worker_id} pushed result to queue")
 
-            with open(f'worker_output_{worker_id}.txt', 'a') as f:
-                f.write(f"Processed task {task_data['id']}\n")
-        else:
-            print(f"Worker {worker_id} timed out waiting for task")
-            break
+        with open(f'worker_output_{worker_id}.txt', 'a') as f:
+            f.write(f"Processed task {task_data['id']}, Result {result}\n")
+    else:
+        print(f"Worker {worker_id} timed out waiting for task")
 
     print(f"Worker {worker_id} finished")
 

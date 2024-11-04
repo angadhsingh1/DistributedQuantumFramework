@@ -1,6 +1,0 @@
-Partial energy = -0.398
-Partial energy = -0.3978056640625
-Partial energy = -0.011294482421875
-Partial energy = -0.180646484375
-
-Total Energy: -0.987746630859375
