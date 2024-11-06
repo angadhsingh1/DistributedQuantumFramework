@@ -1,0 +1,22 @@
+version: '1'
+services:
+  orchestrator:
+    build: .
+    command: python VQEHamiltonianDistribution-V/VHDOrchestrator.py
+    depends_on:
+      - redis
+    environment:
+      - REDIS_HOST=redis
+
+  worker:
+    build: .
+    command: python VQEHamiltonianDistribution-V/VHDWorker.py
+    depends_on:
+      - redis
+    environment:
+      - REDIS_HOST=redis
+
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"

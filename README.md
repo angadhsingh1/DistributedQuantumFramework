@@ -1,7 +1,32 @@
 # Distributed Quantum Computing Sandbox
 
+This project provides a sandbox for running distributed quantum computing experiments using various setups.
 
-## Running Differernt Experiments:
+## Prerequisites
+
+- Docker installed on your machine (for containerized experiments).
+- [Redis](https://redis.io/download) installed and running locally (or via Docker).
+
+## Running Experiments with Docker
+
+You can run the experiments using Docker, which simplifies setup by encapsulating dependencies.
+
+### Setting up Redis (required for certain experiments)
+
+Ensure Redis is running. You can install it locally, or run it as a Docker container:
+docker run -d -p 6379:6379 --name redis redis:alpine
+
+
+### Running the Docker Container
+Pull the Docker image:
+`docker pull your_username/distributed-quantum-sandbox:0.0.1`
+
+### Run the container for a specific experiment:
+`docker run -it --rm your_username/distributed-quantum-sandbox python <path_to_script>`
+
+Replace <path_to_script> with the specific script for the experiment, like VQE.py or VHDOrchestrator.py.
+
+### Running Differernt Experiments:
 
 Make sure to run Virtual Environment before running the experiments. Run the following command in root directory
 `source .venv/bin/activate`
