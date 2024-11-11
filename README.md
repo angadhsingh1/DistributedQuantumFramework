@@ -9,8 +9,6 @@ This project provides a sandbox for running distributed quantum computing experi
 
 ## Running Experiments with Docker
 
-You can run the experiments using Docker, which simplifies setup by encapsulating dependencies.
-
 ### Setting up Redis (required for certain experiments)
 
 Ensure Redis is running. You can install it locally, or run it as a Docker container:
