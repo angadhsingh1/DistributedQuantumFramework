@@ -22,6 +22,8 @@ Pull the Docker image:
 ### Run the container for a specific experiment:
 `docker run -it --rm angadhrsingh/distributed-quantum-sandbox python <path_to_script>`
 
+Example: docker run -it --rm angadhrsingh/distributed-quantum-sandbox python VHDOrchestrator.py
+
 Replace <path_to_script> with the specific script for the experiment, like VQE.py or VHDOrchestrator.py.
 
 ### Running Differernt Experiments:
